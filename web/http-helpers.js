@@ -16,5 +16,7 @@ exports.sendResponse = (res, data, statusCode) => {
 };
 
 exports.serveAssets = (asset, callback) => {
-  callback(fs.readFileSync(asset));
+  fs.readFile(asset, (err, data) => {
+    callback(err, data);
+  });
 };

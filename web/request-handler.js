@@ -7,7 +7,7 @@ var helpers = require('./http-helpers');
 var requestMethods = {
   'GET': function(req, res) {
     if (req.url === '/' || req.url === '') {
-      helpers.serveAssets(__dirname + '/public/index.html', data => { res.end(data); });
+      helpers.serveAssets(__dirname + '/public/index.html', (error, data) => { res.end(data); });
     } else {
       helpers.sendResponse(res, req.url + 'not found', 404, null);
     }
@@ -16,20 +16,50 @@ var requestMethods = {
   'POST': function(req, res) {
     req.on('data', (data) => {
       var url = data.toString('utf-8').substring(4);
-
       archive.isUrlInList(url, boolean => {
-        //check if url exists
+        console.log('is url in list? ' + boolean);
         if (boolean) {
-          //true -> don't add to list
+          archive.isUrlArchived(url, boolean2 => {
+            console.log('is url archived? ' + boolean2);
+            if (boolean2) {
+              helpers.serveAssets(archive.paths.archivedSites + '/' + url, (error, data) => {
+                if (error) { throw error; }
+                console.log(data.toString('utf-8'));
+                res.end(data.toString('utf-8'));
+              });
+            } else {
+              helpers.serveAssets(__dirname + '/public/loading.html', (error, data) => {
+                console.log(data.toString('utf-8'));
+                res.end(data.toString('utf-8'));
+              });
+            }
+          });
         } else {
           archive.addUrlToList(archive.paths.list, url);
+          helpers.serveAssets(__dirname + '/public/loading.html', (error, data) => {
+            console.log(data.toString('utf-8'));
+            res.end(data.toString('utf-8'));
+          });
         }
-      });
+      //   if (boolean) {
+      //     helpers.serveAssets(archive.paths.archivedSites + '/' + url, (error, data) => {
+      //       if (error) { throw error; }
+      //       console.log(data.toString('utf-8'));
+      //       res.end(data.toString('utf-8'));
+      //     });
+      //   } else {
+      //     archive.addUrlToList(archive.paths.list, url);
+      //     helpers.serveAssets(__dirname + '/public/loading.html', (error, data) => {
+      //       console.log(data.toString('utf-8'));
+      //       res.end(data.toString('utf-8'));
+      //     });
+      //   }
+      // });
           //find the right path in archive and retrieve html
           //test #3 won't pass until implemented
-        // res.end();
+      });
     });
-  },
+  }
 };
 
 exports.handleRequest = function (req, res) {
