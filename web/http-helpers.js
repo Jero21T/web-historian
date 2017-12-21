@@ -18,7 +18,3 @@ exports.sendResponse = (res, data, statusCode) => {
 exports.serveAssets = (asset, callback) => {
   callback(fs.readFileSync(asset));
 };
-
-
-
-// As you progress, keep thinking about what helper functions you can put here!
