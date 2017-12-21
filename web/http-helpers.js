@@ -20,3 +20,28 @@ exports.serveAssets = (asset, callback) => {
     callback(err, data);
   });
 };
+
+exports.checkReady = (res, url, boolean) => {
+  if (boolean) {
+    archive.isUrlArchived(url, boolean2 => {
+      console.log('is url archived? ' + boolean2);
+      if (boolean2) {
+        exports.serveAssets(archive.paths.archivedSites + '/' + url, (error, data) => {
+          console.log(data.toString('utf-8'));
+          res.end(data.toString('utf-8'));
+        });
+      } else {
+        exports.serveAssets(__dirname + '/public/loading.html', (error, data) => {
+          console.log(data.toString('utf-8'));
+          res.end(data.toString('utf-8'));
+        });
+      }
+    });
+  } else {
+    archive.addUrlToList(archive.paths.list, url);
+    exports.serveAssets(__dirname + '/public/loading.html', (error, data) => {
+      console.log(data.toString('utf-8'));
+      res.end(data.toString('utf-8'));
+    });
+  }
+};

@@ -49,7 +49,6 @@ exports.isUrlInList = function(url, callback) {
 exports.addUrlToList = function(file, url) {
   url = url + '\n';
   fs.appendFile(file, url);
-  console.log(`added ${url}`);
 };
 
 exports.isUrlArchived = function(url, callback) {
@@ -67,7 +66,6 @@ exports.downloadUrls = function(urls) {
       // console.log('statusCode:', response && response.statusCode);
       // console.log('body:', body);
       fs.writeFile(exports.paths.archivedSites + '/' + url, body, (err) => {
-        console.log('The file has been created!');
       });
     });
   });
